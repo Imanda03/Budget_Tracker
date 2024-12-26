@@ -107,6 +107,9 @@ android {
         }
     }
 }
+project.ext.react = [
+    enableHermes: true,  // Ensure this is true
+]
 
 dependencies {
     // The version of react-native is set by the React Native Gradle Plugin

@@ -125,7 +125,9 @@ const SignUp: React.FC<SignUpProps> = ({navigation}) => {
       <Text style={styles.title as TextStyle}>
         Join, Plan, Prosper – Register to Take Charge of Your Finances!
       </Text>
-      <ScrollView contentContainerStyle={styles.scrollContent}>
+      <ScrollView
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}>
         <View style={styles.loginField}>
           {formFields.map(field => (
             <Controller

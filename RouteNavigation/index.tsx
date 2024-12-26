@@ -8,7 +8,7 @@ import Tabs from './Tabs';
 const RootStack = () => {
   const Stack = createNativeStackNavigator();
 
-  const isLoggedIn = false;
+  const isLoggedIn = true;
   return (
     <Stack.Navigator>
       {isLoggedIn ? (
