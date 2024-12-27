@@ -5,50 +5,34 @@ import {createStyles} from './styles';
 import {useTheme} from '../../../utils/colors';
 
 interface InputProps {
-  placeholder?: string;
   value: string | undefined;
   onChangeText: (text: string) => void;
-  secureTextEntry?: boolean;
   keyboardType?: string;
   error?: string;
+  editable?: boolean;
+  label?: string;
 }
 
 const InputComponent = ({
-  placeholder,
   value,
   onChangeText,
-  secureTextEntry,
-  keyboardType = 'text',
   error,
+  editable,
+  label,
 }: InputProps) => {
-  const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   const styles = createStyles();
   const {theme} = useTheme();
-
-  const onEyePress = () => {
-    setIsPasswordVisible(!isPasswordVisible);
-  };
-
   return (
     <View>
+      <Text style={styles.label}>{label}</Text>
       <View style={[styles.inputContainer, error && styles.inputError]}>
         <TextInput
           style={styles.input}
-          placeholder={placeholder}
           placeholderTextColor={theme.PLACEHOLDER_COLOR}
           value={value}
           onChangeText={onChangeText}
-          secureTextEntry={secureTextEntry && !isPasswordVisible}
+          editable={editable}
         />
-        {secureTextEntry && (
-          <Pressable onPress={onEyePress} style={styles.eyeIcon}>
-            <Entypo
-              name={isPasswordVisible ? 'eye' : 'eye-with-line'}
-              size={22}
-              color={theme.TEXT}
-            />
-          </Pressable>
-        )}
       </View>
       {error && <Text style={styles.errorText}>{error}</Text>}
     </View>

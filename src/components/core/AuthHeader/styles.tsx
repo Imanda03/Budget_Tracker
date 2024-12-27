@@ -11,8 +11,7 @@ export const createStyles = () => {
       alignItems: 'center',
       justifyContent: 'space-between',
       flexDirection: 'row',
-      // paddingHorizontal: 5,
-      // zIndex: 2,
+      // flexGrow: 1,
     },
     title: {
       color: theme.TEXT,

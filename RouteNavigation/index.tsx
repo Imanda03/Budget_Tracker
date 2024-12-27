@@ -4,6 +4,7 @@ import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import LandingScreen from '../src/screen/auth/LandingScreen';
 import AuthRoute from './StackRoute/AuthRoute';
 import Tabs from './Tabs';
+import InnerScreen from './StackRoute/InnerScreen';
 
 const RootStack = () => {
   const Stack = createNativeStackNavigator();
@@ -12,11 +13,18 @@ const RootStack = () => {
   return (
     <Stack.Navigator>
       {isLoggedIn ? (
-        <Stack.Screen
-          name="Tabs"
-          component={Tabs}
-          options={{headerShown: false}}
-        />
+        <>
+          <Stack.Screen
+            name="Tabs"
+            component={Tabs}
+            options={{headerShown: false}}
+          />
+          <Stack.Screen
+            name="InnerScreen"
+            component={InnerScreen}
+            options={{headerShown: false}}
+          />
+        </>
       ) : (
         <Stack.Screen
           name="Auths"

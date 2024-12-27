@@ -93,6 +93,7 @@ const SignUp: React.FC<SignUpProps> = ({navigation}) => {
     {
       name: 'phone',
       placeholder: 'Phone Number',
+
       rules: {
         required: 'Phone number is required',
         pattern: {
