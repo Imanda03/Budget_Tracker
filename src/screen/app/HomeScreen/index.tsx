@@ -1,5 +1,5 @@
 import {View, Text, TouchableOpacity, Pressable, FlatList} from 'react-native';
-import React from 'react';
+import React, {useCallback} from 'react';
 import BackgroundWrapper from '../../../components/BackgroundWrapper';
 import {useTheme} from '../../../utils/colors';
 import {createStyles} from './styles';
@@ -16,15 +16,17 @@ import RecentTransaction from '../../../components/RecentTransaction';
 
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 
-const HomeScreen = () => {
+const HomeScreen = ({navigation}: any) => {
   const styles = createStyles();
   const {theme, isDark, setTheme} = useTheme();
 
   const isExpanded = useSharedValue(false);
 
-  const handlePress = () => {
+  const handlePress = useCallback(() => {
+    'worklet';
+    console.log('Main button pressed, current value:', isExpanded.value);
     isExpanded.value = !isExpanded.value;
-  };
+  }, [isExpanded]);
 
   const plusIconStyle = useAnimatedStyle(() => {
     const moveValue = interpolate(Number(isExpanded.value), [0, 1], [0, 2]);
@@ -39,9 +41,15 @@ const HomeScreen = () => {
     };
   });
 
-  const handleButtonPress = (index: number) => {
-    console.log(`Button ${index} pressed`);
-  };
+  const handleButtonPress = useCallback(
+    (index: number) => {
+      console.log('Button pressed with index:', index);
+      const navigateName = index === 2 ? 'AddTransaction' : 'AddCategory';
+      navigation.navigate('InnerScreen', {screen: navigateName});
+      isExpanded.value = false;
+    },
+    [navigation],
+  );
 
   const RenderFloatingButton = () => {
     return (
@@ -53,17 +61,19 @@ const HomeScreen = () => {
             +
           </Animated.Text>
         </AnimatedPressable>
+
         <FloatingActionButton
           isExpanded={isExpanded}
           index={2}
-          buttonLetter={'+'}
+          buttonLetter="+"
           label="Add Transaction"
           onPress={() => handleButtonPress(2)}
         />
+
         <FloatingActionButton
           isExpanded={isExpanded}
           index={1}
-          buttonLetter={'+'}
+          buttonLetter="+"
           label="Category"
           onPress={() => handleButtonPress(1)}
         />

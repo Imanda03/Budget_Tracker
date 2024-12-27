@@ -1,13 +1,5 @@
-import {
-  View,
-  Text,
-  ImageBackground,
-  Image,
-  KeyboardAvoidingView,
-  TouchableOpacity,
-} from 'react-native';
-import React, {useMemo, useCallback} from 'react';
-import {ScrollView} from 'react-native';
+import {View, Text, Image, TouchableOpacity} from 'react-native';
+import React, {useCallback} from 'react';
 import {useForm, Controller} from 'react-hook-form';
 import AuthHeader from '../../../components/core/AuthHeader';
 import {createStyles} from './styles';

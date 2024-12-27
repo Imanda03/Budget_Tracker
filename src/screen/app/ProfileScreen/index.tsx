@@ -2,16 +2,22 @@ import {View, Text, Button} from 'react-native';
 import React from 'react';
 import BackgroundWrapper from '../../../components/BackgroundWrapper';
 import {useTheme} from '../../../utils/colors';
+import {createStyles} from './styles';
+import {Avatar} from 'react-native-elements';
+import ProfileAvatar from '../../../components/ProfileAvatar';
+import ProfileInformation from '../../../components/PersonalInformation';
 
 const ProfileScreen = () => {
-  const {setTheme} = useTheme();
+  const styles = createStyles();
+  const haveImage: boolean = false;
+
   return (
     <BackgroundWrapper>
-      <Button
-        onPress={() => setTheme(prev => (prev === 'light' ? 'dark' : 'light'))}
-        title="Switch Mode"
-      />
-      <Text>ProfileScreen</Text>
+      <View style={styles.headerContainer} />
+      <View style={styles.avatarContainer}>
+        <ProfileAvatar />
+      </View>
+      <ProfileInformation />
     </BackgroundWrapper>
   );
 };

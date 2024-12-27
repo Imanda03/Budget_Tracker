@@ -20,5 +20,8 @@ export const createStyles = () => {
       backgroundColor: theme.BACKGROUND,
       opacity: 0.9,
     },
+    contentContainer: {
+      flex: 1,
+    },
   });
 };

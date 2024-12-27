@@ -24,7 +24,7 @@ const BackgroundWrapper: React.FC<BackgroundWrapperProps> = ({
       source={require('../../assets/Image/backgroundImage.jpg')}
       style={[styles.imageBackground, style]}>
       <View style={styles.overlay} />
-      <View>{children}</View>
+      <View style={styles.contentContainer}>{children}</View>
     </ImageBackground>
   );
 };
