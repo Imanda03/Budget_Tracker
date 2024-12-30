@@ -1,5 +1,5 @@
 import {View, Text, TouchableOpacity, Pressable, FlatList} from 'react-native';
-import React, {useCallback} from 'react';
+import React, {useCallback, useState} from 'react';
 import BackgroundWrapper from '../../../components/BackgroundWrapper';
 import {useTheme} from '../../../utils/colors';
 import {createStyles} from './styles';
@@ -19,34 +19,24 @@ const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 const HomeScreen = ({navigation}: any) => {
   const styles = createStyles();
   const {theme, isDark, setTheme} = useTheme();
-
-  const isExpanded = useSharedValue(false);
+  const [isExpanded, setIsExpanded] = useState(false);
 
   const handlePress = useCallback(() => {
-    'worklet';
-    console.log('Main button pressed, current value:', isExpanded.value);
-    isExpanded.value = !isExpanded.value;
-  }, [isExpanded]);
+    setIsExpanded(prev => !prev);
+  }, []);
 
   const plusIconStyle = useAnimatedStyle(() => {
-    const moveValue = interpolate(Number(isExpanded.value), [0, 1], [0, 2]);
-    const translateValue = withTiming(moveValue);
-    const rotateValue = isExpanded.value ? '45deg' : '0deg';
-
+    const rotateValue = withTiming(isExpanded ? '45deg' : '0deg');
     return {
-      transform: [
-        {translateX: translateValue},
-        {rotate: withTiming(rotateValue)},
-      ],
+      transform: [{rotate: rotateValue}],
     };
   });
 
   const handleButtonPress = useCallback(
     (index: number) => {
-      console.log('Button pressed with index:', index);
       const navigateName = index === 2 ? 'AddTransaction' : 'AddCategory';
       navigation.navigate('InnerScreen', {screen: navigateName});
-      isExpanded.value = false;
+      setIsExpanded(false);
     },
     [navigation],
   );
@@ -66,7 +56,7 @@ const HomeScreen = ({navigation}: any) => {
           isExpanded={isExpanded}
           index={2}
           buttonLetter="+"
-          label="Add Transaction"
+          label="Transaction"
           onPress={() => handleButtonPress(2)}
         />
 
@@ -126,7 +116,7 @@ const HomeScreen = ({navigation}: any) => {
                 </TouchableOpacity>
               </View>
             }
-            ListFooterComponent={<View style={{height: 400}} />}
+            ListFooterComponent={<View style={{height: 200}} />}
           />
         </BackgroundWrapper>
       </View>
