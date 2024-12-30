@@ -39,10 +39,11 @@ export const createStyles = () => {
 
     buttonContainer: {
       bottom: '140%',
-      right: width * 0.05,
+      right: width * 0.01,
       display: 'flex',
       flexDirection: 'column',
       alignItems: 'center',
+      zIndex: 50,
     },
 
     mainButton: {

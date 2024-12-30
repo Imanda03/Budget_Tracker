@@ -12,7 +12,7 @@ export const createStyles = () => {
       shadowRadius: 3,
     },
     button: {
-      width: 160,
+      width: 120,
       height: 45,
       backgroundColor: theme.DARK_BG,
       position: 'absolute',
