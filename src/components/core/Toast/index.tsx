@@ -13,7 +13,7 @@ interface ToastProps {
 const Toast: React.FC<ToastProps> = ({
   message,
   type = 'info',
-  duration = 30000000,
+  duration = 2000,
   onHide,
 }) => {
   console.log('first');

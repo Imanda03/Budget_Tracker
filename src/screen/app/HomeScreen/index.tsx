@@ -118,7 +118,9 @@ const HomeScreen = ({navigation}: any) => {
           />
         </BackgroundWrapper>
       </View>
-      <View style={styles.fabWrapper}>{RenderFloatingButton()}</View>
+      <View style={styles.fabWrapper}>
+        <RenderFloatingButton />
+      </View>
     </View>
   );
 };

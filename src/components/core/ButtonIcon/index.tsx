@@ -1,4 +1,4 @@
-import {View, Text, TouchableOpacity} from 'react-native';
+import {View, Text, TouchableOpacity, ActivityIndicator} from 'react-native';
 import React from 'react';
 import {createStyles} from './styles';
 import {EntypoIcon, IoniconsIcon} from '../../../utils/Icon';
@@ -9,6 +9,7 @@ interface ButtonProps {
   onPress: () => void;
   iconName?: string;
   marginTop?: number;
+  loading?: boolean;
 }
 
 const ButtonIconComponent = ({
@@ -16,23 +17,34 @@ const ButtonIconComponent = ({
   onPress,
   iconName,
   marginTop,
+  loading,
 }: ButtonProps) => {
   const styles = createStyles(iconName);
   const {theme} = useTheme();
   return (
     <TouchableOpacity
-      style={[styles.container, {marginTop: marginTop ?? 0}]}
+      style={[
+        styles.container,
+        {marginTop: marginTop ?? 0, opacity: loading ? 0.5 : 1},
+      ]}
       activeOpacity={0.7}
-      onPress={onPress}>
+      onPress={onPress}
+      disabled={loading}>
       {iconName && <View></View>}
-      <Text style={styles.text}>{title}</Text>
-      {iconName && (
-        <EntypoIcon
-          name={iconName}
-          color={theme.SECONDARY}
-          size={30}
-          style={styles.icon}
-        />
+      {loading ? (
+        <ActivityIndicator size="large" color={theme.SECONDARY} />
+      ) : (
+        <>
+          <Text style={styles.text}>{title}</Text>
+          {iconName && (
+            <EntypoIcon
+              name={iconName}
+              color={theme.SECONDARY}
+              size={30}
+              style={styles.icon}
+            />
+          )}
+        </>
       )}
     </TouchableOpacity>
   );
