@@ -88,7 +88,7 @@ const TabBarButton = ({accessibilityState, children, onPress}: any) => {
 
   useEffect(() => {
     Animated.spring(translateYValue, {
-      toValue: focused ? -1 : 0,
+      toValue: focused ? -10 : 5,
       useNativeDriver: true,
     }).start();
   }, [focused]);

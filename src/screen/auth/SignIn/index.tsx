@@ -33,8 +33,30 @@ const formFields = [
   },
 ] as const;
 
+const FormInput = React.memo(
+  ({
+    field,
+    fieldConfig,
+    error,
+  }: {
+    field: any;
+    fieldConfig: (typeof formFields)[number];
+    error?: string;
+  }) => (
+    <Input
+      value={field.value}
+      onChangeText={field.onChange}
+      placeholder={fieldConfig.placeholder}
+      secureTextEntry={fieldConfig.secureTextEntry}
+      error={error}
+    />
+  ),
+);
+
 const SignIn = React.memo(({navigation}: any) => {
   const styles = createStyles();
+
+  console.log('checked');
 
   const {
     control,
@@ -50,22 +72,6 @@ const SignIn = React.memo(({navigation}: any) => {
   const onSubmit = useCallback((data: FormData) => {
     console.log(data);
   }, []);
-
-  const renderInput = useCallback(
-    ({field: {onChange, value}, fieldName}: any) => {
-      const fieldConfig = formFields.find(f => f.name === fieldName);
-      return (
-        <Input
-          value={value}
-          onChangeText={onChange}
-          placeholder={fieldConfig?.placeholder}
-          secureTextEntry={fieldConfig?.secureTextEntry}
-          error={errors[fieldName as keyof FormData]?.message}
-        />
-      );
-    },
-    [errors],
-  );
 
   return (
     <BackgroundWrapper>
@@ -90,7 +96,13 @@ const SignIn = React.memo(({navigation}: any) => {
               control={control}
               name={field.name as keyof FormData}
               rules={field.rules}
-              render={props => renderInput({...props, fieldName: field.name})}
+              render={({field: fieldProps}) => (
+                <FormInput
+                  field={fieldProps}
+                  fieldConfig={field}
+                  error={errors[field.name as keyof FormData]?.message}
+                />
+              )}
             />
           ))}
           <ButtonIconComponent

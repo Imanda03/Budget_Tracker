@@ -5,14 +5,21 @@ import LandingScreen from '../src/screen/auth/LandingScreen';
 import AuthRoute from './StackRoute/AuthRoute';
 import Tabs from './Tabs';
 import InnerScreen from './StackRoute/InnerScreen';
+import {useAuth} from '../src/context/AuthContext';
 
 const RootStack = () => {
   const Stack = createNativeStackNavigator();
 
-  const isLoggedIn = true;
+  const {authToken} = useAuth();
+
   return (
-    <Stack.Navigator>
-      {isLoggedIn ? (
+    <Stack.Navigator
+      screenOptions={{
+        animation: 'slide_from_right',
+        contentStyle: {backgroundColor: 'black'},
+        animationDuration: 3500,
+      }}>
+      {authToken ? (
         <>
           <Stack.Screen
             name="Tabs"

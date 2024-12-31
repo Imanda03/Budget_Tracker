@@ -1,5 +1,5 @@
-import React, {useState} from 'react';
-import {View, TextInput, Pressable, Text, StyleSheet} from 'react-native';
+import React, {useState, useCallback} from 'react';
+import {View, TextInput, Pressable, Text} from 'react-native';
 import Entypo from 'react-native-vector-icons/Entypo';
 import {createStyles} from './styles';
 import {useTheme} from '../../../utils/colors';
@@ -13,46 +13,48 @@ interface InputProps {
   error?: string;
 }
 
-const InputComponent = ({
-  placeholder,
-  value,
-  onChangeText,
-  secureTextEntry,
-  keyboardType = 'text',
-  error,
-}: InputProps) => {
-  const [isPasswordVisible, setIsPasswordVisible] = useState(false);
-  const styles = createStyles();
-  const {theme} = useTheme();
+const InputComponent = React.memo(
+  ({
+    placeholder,
+    value,
+    onChangeText,
+    secureTextEntry,
+    keyboardType = 'text',
+    error,
+  }: InputProps) => {
+    const [isPasswordVisible, setIsPasswordVisible] = useState(false);
+    const styles = createStyles();
+    const {theme} = useTheme();
 
-  const onEyePress = () => {
-    setIsPasswordVisible(!isPasswordVisible);
-  };
+    const onEyePress = useCallback(() => {
+      setIsPasswordVisible(prev => !prev);
+    }, []);
 
-  return (
-    <View>
-      <View style={[styles.inputContainer, error && styles.inputError]}>
-        <TextInput
-          style={styles.input}
-          placeholder={placeholder}
-          placeholderTextColor={theme.PLACEHOLDER_COLOR}
-          value={value}
-          onChangeText={onChangeText}
-          secureTextEntry={secureTextEntry && !isPasswordVisible}
-        />
-        {secureTextEntry && (
-          <Pressable onPress={onEyePress} style={styles.eyeIcon}>
-            <Entypo
-              name={isPasswordVisible ? 'eye' : 'eye-with-line'}
-              size={22}
-              color={theme.TEXT}
-            />
-          </Pressable>
-        )}
+    return (
+      <View>
+        <View style={[styles.inputContainer, error && styles.inputError]}>
+          <TextInput
+            style={styles.input}
+            placeholder={placeholder}
+            placeholderTextColor={theme.PLACEHOLDER_COLOR}
+            value={value}
+            onChangeText={onChangeText}
+            secureTextEntry={secureTextEntry && !isPasswordVisible}
+          />
+          {secureTextEntry && (
+            <Pressable onPress={onEyePress} style={styles.eyeIcon}>
+              <Entypo
+                name={isPasswordVisible ? 'eye' : 'eye-with-line'}
+                size={22}
+                color={theme.TEXT}
+              />
+            </Pressable>
+          )}
+        </View>
+        {error && <Text style={styles.errorText}>{error}</Text>}
       </View>
-      {error && <Text style={styles.errorText}>{error}</Text>}
-    </View>
-  );
-};
+    );
+  },
+);
 
-export default React.memo(InputComponent);
+export default InputComponent;
