@@ -56,8 +56,6 @@ const FormInput = React.memo(
 const SignIn = React.memo(({navigation}: any) => {
   const styles = createStyles();
 
-  console.log('checked');
-
   const {
     control,
     handleSubmit,

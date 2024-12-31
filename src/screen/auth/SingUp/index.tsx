@@ -8,6 +8,7 @@ import {
   TouchableOpacity,
   ViewStyle,
   TextStyle,
+  KeyboardTypeOptions,
 } from 'react-native';
 import React from 'react';
 import {useForm, Controller, SubmitHandler} from 'react-hook-form';
@@ -16,15 +17,10 @@ import {createStyles} from './styles';
 import ButtonIconComponent from '../../../components/core/ButtonIcon';
 import Input from '../../../components/core/Input';
 import BackgroundWrapper from '../../../components/BackgroundWrapper';
-
-interface FormData {
-  fullName: string;
-  address: string;
-  email: string;
-  phone: string;
-  password: string;
-  confirmPassword: string;
-}
+import {userRegister} from '../../../services/AuthService';
+import {ApiError, userDataProps} from '../../../utils/types';
+import {useToast} from '../../../context/ToastContext';
+import {AxiosError} from 'axios';
 
 interface InputProps {
   value: string;
@@ -42,46 +38,87 @@ interface SignUpProps {
 
 const SignUp: React.FC<SignUpProps> = ({navigation}) => {
   const styles = createStyles();
+  const {showToast} = useToast();
+
+  const {mutate, isLoading, isError, error} = userRegister();
 
   const {
     control,
     handleSubmit,
     formState: {errors},
     watch,
-  } = useForm<FormData>({
+    setError,
+  } = useForm<userDataProps>({
     defaultValues: {
       fullName: '',
       address: '',
       email: '',
-      phone: '',
+      phoneNumber: '',
       password: '',
       confirmPassword: '',
     },
   });
 
-  const onSubmit: SubmitHandler<FormData> = (data: FormData): void => {
-    console.log(data);
+  const onSubmit: SubmitHandler<userDataProps> = (
+    data: userDataProps,
+  ): void => {
+    mutate(data, {
+      onSuccess: response => {
+        console.log('Success Response:', response);
+        showToast(response.message, 'success');
+        navigation.replace('SignIn');
+      },
+      onError: (error: AxiosError<ApiError>) => {
+        console.log('res===>', error?.response);
+        if (error?.response?.data?.errors) {
+          if (error.response.data.errors?.length === 1) {
+            showToast(error.response.data.errors?.[0]?.message, 'error');
+          } else {
+            showToast('Please check the form for errors', 'error');
+          }
+          const backendErrors = error.response.data.errors;
+
+          backendErrors.forEach(({field, message}: any) => {
+            console.log(`Setting error for field ${field}:`, message);
+            field &&
+              setError(field as keyof userDataProps, {
+                type: 'manual',
+                message,
+              });
+          });
+        } else {
+          const errorMessage =
+            error.response?.data?.message ||
+            'Registration failed. Please try again.';
+          showToast(errorMessage, 'error');
+        }
+      },
+    });
   };
 
   const formFields: Array<{
-    name: keyof FormData;
+    name: keyof userDataProps;
     placeholder: string;
     rules: Object;
     secureTextEntry?: boolean;
+    keyboardType?: KeyboardTypeOptions;
   }> = [
     {
       name: 'fullName',
       placeholder: 'Full name',
       rules: {required: 'Full name is required'},
+      keyboardType: 'default',
     },
     {
       name: 'address',
       placeholder: 'Address',
       rules: {required: 'Address is required'},
+      keyboardType: 'default',
     },
     {
       name: 'email',
       placeholder: 'Email',
+      keyboardType: 'default',
       rules: {
         required: 'Email is required',
         pattern: {
@@ -91,9 +128,9 @@ const SignUp: React.FC<SignUpProps> = ({navigation}) => {
       },
     },
     {
-      name: 'phone',
+      name: 'phoneNumber',
       placeholder: 'Phone Number',
-
+      keyboardType: 'number-pad',
       rules: {
         required: 'Phone number is required',
         pattern: {
@@ -107,10 +144,12 @@ const SignUp: React.FC<SignUpProps> = ({navigation}) => {
       placeholder: 'Password',
       rules: {required: 'Password is required'},
       secureTextEntry: true,
+      keyboardType: 'default',
     },
     {
       name: 'confirmPassword',
       placeholder: 'Confirm Password',
+      keyboardType: 'default',
       rules: {
         required: 'Please confirm your password',
         validate: (val: string) =>
@@ -143,6 +182,7 @@ const SignUp: React.FC<SignUpProps> = ({navigation}) => {
                   placeholder={field.placeholder}
                   error={errors[field.name]?.message}
                   secureTextEntry={field.secureTextEntry}
+                  keyboardType={field.keyboardType}
                 />
               )}
             />
@@ -152,6 +192,7 @@ const SignUp: React.FC<SignUpProps> = ({navigation}) => {
             marginTop={20}
             title="Register"
             onPress={handleSubmit(onSubmit)}
+            loading={isLoading}
           />
           <View style={styles.forgotPassword}>
             <TouchableOpacity

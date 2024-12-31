@@ -1,15 +1,21 @@
 import React, {useState, useCallback} from 'react';
-import {View, TextInput, Pressable, Text} from 'react-native';
+import {
+  View,
+  TextInput,
+  Pressable,
+  Text,
+  KeyboardTypeOptions,
+} from 'react-native';
 import Entypo from 'react-native-vector-icons/Entypo';
 import {createStyles} from './styles';
 import {useTheme} from '../../../utils/colors';
 
 interface InputProps {
   placeholder?: string;
-  value: string | undefined;
+  value: string;
   onChangeText: (text: string) => void;
   secureTextEntry?: boolean;
-  keyboardType?: string;
+  keyboardType?: KeyboardTypeOptions;
   error?: string;
 }
 
@@ -19,7 +25,7 @@ const InputComponent = React.memo(
     value,
     onChangeText,
     secureTextEntry,
-    keyboardType = 'text',
+    keyboardType,
     error,
   }: InputProps) => {
     const [isPasswordVisible, setIsPasswordVisible] = useState(false);
@@ -40,6 +46,7 @@ const InputComponent = React.memo(
             value={value}
             onChangeText={onChangeText}
             secureTextEntry={secureTextEntry && !isPasswordVisible}
+            keyboardType={keyboardType ?? 'default'}
           />
           {secureTextEntry && (
             <Pressable onPress={onEyePress} style={styles.eyeIcon}>

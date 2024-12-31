@@ -5,13 +5,6 @@ export const createStyles = () => {
   const {theme} = useTheme();
 
   return StyleSheet.create({
-    // input: {
-    //   height: 60,
-    //   padding: 20,
-    //   borderRadius: 10,
-    //   backgroundColor: '#e6e7eb',
-    //   marginVertical: 10,
-    // },
     inputContainer: {
       flexDirection: 'row',
       alignItems: 'center',
@@ -27,6 +20,7 @@ export const createStyles = () => {
     input: {
       // flex: 1,
       height: '100%',
+      width: '85%',
       padding: 20,
       color: theme.TEXT,
     },
@@ -39,9 +33,10 @@ export const createStyles = () => {
     },
     errorText: {
       color: theme.ERROR,
-      fontSize: 12,
-      marginTop: 4,
+      fontSize: 13,
+      // marginTop: 4,
       marginLeft: 4,
+      fontWeight: '500',
     },
   });
 };
