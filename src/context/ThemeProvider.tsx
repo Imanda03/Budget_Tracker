@@ -6,6 +6,7 @@ import React, {
 } from 'react';
 import {ActivityIndicator, useColorScheme} from 'react-native';
 import {getItem, setItem} from '../assets/storage';
+import LoadingScreen from '../components/LoadingScreen';
 
 export type ThemeOptions = 'light' | 'dark';
 
@@ -52,8 +53,7 @@ const ThemeProvider: React.FC<PropsWithChildren> = ({
   }, [theme, isLoading]);
 
   if (isLoading) {
-    // You might want to return a loading indicator here
-    return <ActivityIndicator size="large" />;
+    return <LoadingScreen />;
   }
 
   return (

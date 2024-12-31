@@ -15,6 +15,9 @@ const common = {
   PRIMARY: '#1A1A1A',
   SECONDARY: '#FCFCFC',
   PRICE_ERROR: '#b51b10',
+  WARNING_LIGHT: '#FFF3CD',
+  ERROR_LIGHT: '#FDECEA',
+  SUCCESS_LIGHT: '#E8F5E9',
 } as const;
 
 export interface ThemeColors {
@@ -23,8 +26,11 @@ export interface ThemeColors {
   BACKGROUND: string;
   TEXT: string;
   WARNING: string;
+  WARNING_LIGHT: string;
   ERROR: string;
+  ERROR_LIGHT: string;
   SUCCESS: string;
+  SUCCESS_LIGHT: string;
   PURPLE: string;
   SHADOW: string;
   SHADOW_OPACITY: number;

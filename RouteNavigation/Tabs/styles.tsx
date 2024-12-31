@@ -1,19 +1,20 @@
 import {StyleSheet} from 'react-native';
 import {useTheme} from '../../src/utils/colors';
 
-export const createStyles = () => {
+export const createStyles = (focused?: boolean) => {
   const {theme} = useTheme();
 
   return StyleSheet.create({
     tabBar: {
       position: 'absolute',
-      bottom: 10,
+      bottom: 5,
       left: 10,
       right: 10,
       elevation: 5,
       backgroundColor: theme.NAVBAR_BACKGROUND,
       borderRadius: 30,
       height: 70,
+      marginHorizontal: 5,
     },
     tabBarItem: {
       padding: 5,
@@ -26,6 +27,7 @@ export const createStyles = () => {
       textAlign: 'center',
       width: 60,
       marginBottom: 10,
+      fontWeight: 'bold',
     },
     tabBarButtonContainer: {
       flex: 1,
@@ -40,8 +42,10 @@ export const createStyles = () => {
     },
     tabBarButtonActive: {
       backgroundColor: theme.NAVBAR_ACTIVE_BACKGROUND,
-      borderRadius: 20,
+      borderRadius: 30,
       marginHorizontal: 10,
+      padding: 5,
+      opacity: 0.9,
     },
   });
 };

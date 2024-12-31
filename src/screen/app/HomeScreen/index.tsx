@@ -13,6 +13,7 @@ import Animated, {
 } from 'react-native-reanimated';
 import {FloatingActionButton} from '../../../components/FloatingActionButton';
 import RecentTransaction from '../../../components/RecentTransaction';
+import Toast from '../../../components/core/Toast';
 
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 
@@ -51,7 +52,6 @@ const HomeScreen = ({navigation}: any) => {
             +
           </Animated.Text>
         </AnimatedPressable>
-
         <FloatingActionButton
           isExpanded={isExpanded}
           index={2}
@@ -59,7 +59,6 @@ const HomeScreen = ({navigation}: any) => {
           label="Transaction"
           onPress={() => handleButtonPress(2)}
         />
-
         <FloatingActionButton
           isExpanded={isExpanded}
           index={1}
@@ -96,7 +95,6 @@ const HomeScreen = ({navigation}: any) => {
             </TouchableOpacity>
           </View>
           <CardComponent />
-
           <FlatList
             data={[1, 2, 3, 4, 5, 6, 7, 8.9, 10, 11]}
             renderItem={renderRecentTransaction}
