@@ -6,11 +6,10 @@ import {createStyles} from './styles';
 import Input from '../../../components/core/Input';
 import ButtonIconComponent from '../../../components/core/ButtonIcon';
 import BackgroundWrapper from '../../../components/BackgroundWrapper';
-
-interface FormData {
-  email: string;
-  password: string;
-}
+import {ApiError, loginData} from '../../../utils/types';
+import {useToast} from '../../../context/ToastContext';
+import {useLogin} from '../../../services/AuthService';
+import {AxiosError} from 'axios';
 
 const formFields = [
   {
@@ -55,20 +54,54 @@ const FormInput = React.memo(
 
 const SignIn = React.memo(({navigation}: any) => {
   const styles = createStyles();
+  const {showToast} = useToast();
+
+  const {mutate, isLoading, isError, error} = useLogin();
 
   const {
     control,
     handleSubmit,
     formState: {errors},
-  } = useForm<FormData>({
+    setError,
+  } = useForm<loginData>({
     defaultValues: {
       email: '',
       password: '',
     },
   });
 
-  const onSubmit = useCallback((data: FormData) => {
-    console.log(data);
+  const onSubmit = useCallback((data: loginData) => {
+    mutate(data, {
+      onSuccess: response => {
+        console.log('Success Response:', response);
+        showToast(response.message, 'success');
+      },
+      onError: (error: AxiosError<ApiError>) => {
+        console.log('res===>', error?.response);
+        if (error?.response?.data?.errors) {
+          if (error.response.data.errors?.length === 1) {
+            showToast(error.response.data.errors?.[0]?.message, 'error');
+          } else {
+            showToast('Please check the form for errors', 'error');
+          }
+          const backendErrors = error.response.data.errors;
+
+          backendErrors.forEach(({field, message}: any) => {
+            console.log(`Setting error for field ${field}:`, message);
+            field &&
+              setError(field as keyof loginData, {
+                type: 'manual',
+                message,
+              });
+          });
+        } else {
+          const errorMessage =
+            error.response?.data?.message ||
+            'Registration failed. Please try again.';
+          showToast(errorMessage, 'error');
+        }
+      },
+    });
   }, []);
 
   return (
@@ -92,19 +125,19 @@ const SignIn = React.memo(({navigation}: any) => {
             <Controller
               key={field.name}
               control={control}
-              name={field.name as keyof FormData}
+              name={field.name as keyof loginData}
               rules={field.rules}
               render={({field: fieldProps}) => (
                 <FormInput
                   field={fieldProps}
                   fieldConfig={field}
-                  error={errors[field.name as keyof FormData]?.message}
+                  error={errors[field.name as keyof loginData]?.message}
                 />
               )}
             />
           ))}
           <ButtonIconComponent
-            marginTop={10}
+            marginTop={15}
             title="Login"
             onPress={handleSubmit(onSubmit)}
           />

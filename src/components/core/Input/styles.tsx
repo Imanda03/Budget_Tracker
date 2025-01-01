@@ -18,7 +18,6 @@ export const createStyles = () => {
       justifyContent: 'space-between',
     },
     input: {
-      // flex: 1,
       height: '100%',
       width: '85%',
       padding: 20,
