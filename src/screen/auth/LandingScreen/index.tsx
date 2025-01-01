@@ -1,5 +1,5 @@
 import {View, Text, Image, Button} from 'react-native';
-import React from 'react';
+import React, {useEffect} from 'react';
 import {createStyles} from './styles';
 import {useTheme} from '../../../utils/colors';
 import ButtonIconComponent from '../../../components/core/ButtonIcon';

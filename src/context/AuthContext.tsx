@@ -1,81 +1,89 @@
 import React, {createContext, useContext, useEffect, useState} from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {jwtDecode, JwtPayload} from 'jwt-decode';
+import {jwtDecode} from 'jwt-decode';
 
-const AuthContext = createContext<any>(null);
+interface AuthContextType {
+  authToken: string | null;
+  userId: string | null;
+  login: (token: string) => Promise<void>;
+  logout: () => Promise<void>;
+  isLoading: boolean;
+}
+
+const AuthContext = createContext<AuthContextType | null>(null);
 
 export const AuthProvider = ({children}: {children: React.ReactNode}) => {
   const [authToken, setAuthToken] = useState<string | null>(null);
   const [userId, setUserId] = useState<string | null>(null);
-
-  const isTokenExpired = (token: string): boolean => {
-    // try {
-    //   const decoded: JwtPayload = jwtDecode(token);
-    //   if (decoded.exp) {
-    //     const currentTime = Math.floor(Date.now() / 1000); // Current time in seconds
-    //     return decoded.exp < currentTime; // Token is expired if current time > expiration time
-    //   }
-    //   return false; // If no `exp` field, treat it as valid
-    // } catch (error) {
-    //   console.error('Error decoding token:', error);
-    //   return true; // Assume expired if decoding fails
-    // }
-    return false;
-  };
+  const [isLoading, setIsLoading] = useState(true);
 
   const logout = async () => {
-    setAuthToken(null);
-    setUserId(null);
-    await AsyncStorage.removeItem('authToken');
+    try {
+      await AsyncStorage.removeItem('sessionJwt');
+      setAuthToken(null);
+      setUserId(null);
+    } catch (error) {
+      console.error('Logout error:', error);
+    }
   };
 
   const loadAuthData = async () => {
-    const token = await AsyncStorage.getItem('authToken');
-    if (token) {
-      if (isTokenExpired(token)) {
-        await logout(); // Log out if token is expired
-      } else {
+    try {
+      const token = await AsyncStorage.getItem('sessionJwt');
+
+      if (token) {
         setAuthToken(token);
-        const decoded: any = jwtDecode(token);
-        setUserId(decoded.userId); // Adjust according to the token structure
+        // try {
+        //   const decoded: any = jwtDecode(token);
+        //   setUserId(decoded.id);
+        // } catch (error) {
+        //   console.error('Token decode error:', error);
+        //   await logout();
+        // }
       }
+    } catch (error) {
+      console.error('Load auth data error:', error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
   useEffect(() => {
-    loadAuthData(); // Check token validity when the app starts
+    loadAuthData();
   }, []);
 
-  useEffect(() => {
-    if (authToken) {
-      const decoded: JwtPayload = jwtDecode(authToken);
-      if (decoded.exp) {
-        const expiresIn = decoded.exp * 1000 - Date.now(); // Time until expiration in milliseconds
-        const timeout = setTimeout(() => {
-          logout(); // Log out when the token expires
-        }, expiresIn);
-
-        return () => clearTimeout(timeout); // Clear timeout on cleanup
-      }
-    }
-  }, [authToken]);
-
   const login = async (token: string) => {
-    if (isTokenExpired(token)) {
-      console.error('Cannot login with an expired token');
-      return;
+    try {
+      await AsyncStorage.setItem('sessionJwt', token);
+
+      setAuthToken(token);
+
+      // const decoded: any = jwtDecode(token);
+      // setUserId(decoded.id);
+    } catch (error) {
+      console.error('Login error:', error);
+      throw error;
     }
-    setAuthToken(token);
-    const decoded: any = jwtDecode(token);
-    setUserId(decoded.userId);
-    await AsyncStorage.setItem('authToken', token);
   };
 
   return (
-    <AuthContext.Provider value={{authToken, userId, login, logout}}>
+    <AuthContext.Provider
+      value={{
+        authToken,
+        userId,
+        login,
+        logout,
+        isLoading,
+      }}>
       {children}
     </AuthContext.Provider>
   );
 };
 
-export const useAuth = () => useContext(AuthContext);
+export const useAuth = () => {
+  const context = useContext(AuthContext);
+  if (!context) {
+    throw new Error('useAuth must be used within an AuthProvider');
+  }
+  return context;
+};

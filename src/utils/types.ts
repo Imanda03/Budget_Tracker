@@ -7,6 +7,11 @@ export interface userDataProps {
   confirmPassword: string;
 }
 
+export interface loginData {
+  email: string;
+  password: string;
+}
+
 export interface ApiError {
   message: string;
   errors?: Array<{

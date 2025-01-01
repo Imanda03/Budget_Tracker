@@ -20,6 +20,8 @@ const onAppStateChange = (status: AppStateStatus) => {
 export default function App() {
   const [isLoading, setIsLoading] = useState(true);
 
+  console.log('check API ===>', process.env.API_URL);
+
   useEffect(() => {
     const subscription = AppState.addEventListener('change', onAppStateChange);
 

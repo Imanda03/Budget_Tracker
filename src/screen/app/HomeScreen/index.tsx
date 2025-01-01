@@ -1,5 +1,5 @@
 import {View, Text, TouchableOpacity, Pressable, FlatList} from 'react-native';
-import React, {useCallback, useState} from 'react';
+import React, {useCallback, useEffect, useState} from 'react';
 import BackgroundWrapper from '../../../components/BackgroundWrapper';
 import {useTheme} from '../../../utils/colors';
 import {createStyles} from './styles';
@@ -14,6 +14,7 @@ import Animated, {
 import {FloatingActionButton} from '../../../components/FloatingActionButton';
 import RecentTransaction from '../../../components/RecentTransaction';
 import Toast from '../../../components/core/Toast';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 
@@ -21,6 +22,14 @@ const HomeScreen = ({navigation}: any) => {
   const styles = createStyles();
   const {theme, isDark, setTheme} = useTheme();
   const [isExpanded, setIsExpanded] = useState(false);
+
+  useEffect(() => {
+    const fetch = async () => {
+      console.log('token ====>', await AsyncStorage.getItem('sessionJwt'));
+    };
+
+    fetch();
+  }, []);
 
   const handlePress = useCallback(() => {
     setIsExpanded(prev => !prev);

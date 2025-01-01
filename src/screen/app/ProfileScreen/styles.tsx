@@ -5,6 +5,7 @@ export const createStyles = () => {
   const {theme} = useTheme();
   return StyleSheet.create({
     headerContainer: {
+      position: 'relative',
       justifyContent: 'space-between',
       alignItems: 'center',
       marginHorizontal: '-5%',
@@ -24,6 +25,11 @@ export const createStyles = () => {
       alignItems: 'center',
       marginTop: '-35%',
       height: '20%',
+    },
+    logout: {
+      position: 'absolute',
+      right: 10,
+      top: 15,
     },
   });
 };
