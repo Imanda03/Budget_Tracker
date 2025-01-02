@@ -8,8 +8,8 @@ export const createStyles = () => {
     container: {
       flexDirection: 'row',
       justifyContent: 'space-between',
-      padding: 16,
-      marginVertical: 8,
+      padding: 13,
+      marginVertical: 4,
       borderRadius: 12,
     },
     leftContent: {
@@ -37,6 +37,27 @@ export const createStyles = () => {
     date: {
       fontSize: 12,
       opacity: 0.7,
+      marginTop: 4,
+    },
+    categoryContainer: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 5,
+    },
+    rightAction: {
+      // backgroundColor: theme.ERROR,
+      justifyContent: 'center',
+      alignItems: 'center',
+      width: 80,
+      height: '100%',
+      borderRadius: 8,
+      marginVertical: 4,
+      // opacity: 0.5,
+    },
+    deleteText: {
+      color: theme.ERROR,
+      fontSize: 16,
+      fontWeight: 'bold',
       marginTop: 4,
     },
   });

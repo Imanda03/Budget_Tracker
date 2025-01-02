@@ -7,12 +7,25 @@ import Select from '../core/Select';
 import DatePicker from '../core/DatePicker';
 import TextArea from '../core/TextArea';
 import ButtonIconComponent from '../core/ButtonIcon';
+import {useQuery, useQueryClient} from 'react-query';
+import {getCategory} from '../../services/CategoryService';
+import {createTransaction} from '../../services/TransactionService';
+import InputComponent from '../core/Input';
+import {useToast} from '../../context/ToastContext';
+
+interface Category {
+  id: string;
+  title: string;
+  icon: string;
+  type: 'income' | 'expense';
+}
 
 type FormData = {
-  amount: string;
-  category: string;
+  price: string;
+  categoryId: string;
   date: Date;
-  note: string;
+  description: string;
+  title: string;
 };
 
 interface IncomeExpensesProps {
@@ -21,50 +34,100 @@ interface IncomeExpensesProps {
 
 const IncomeExpenses: React.FC<IncomeExpensesProps> = ({type}) => {
   const styles = createStyles();
-
+  const {showToast} = useToast();
   const {
     control,
     handleSubmit,
     formState: {errors},
+    setError,
     reset,
-  } = useForm<FormData>({
-    defaultValues: {
-      amount: '',
-      category: '',
-      date: new Date(),
-      note: '',
-    },
-  });
+  } = useForm<FormData>();
 
-  // Reset form when type changes
+  const {data: categories = []} = useQuery(['CategoryList'], getCategory);
+
+  const {mutate, isLoading} = createTransaction();
+  const queryClient = useQueryClient();
+
+  const formReset = {
+    price: '',
+    categoryId: '',
+    date: new Date(),
+    description: '',
+    title: '',
+  };
+
   useEffect(() => {
-    reset({
-      amount: '',
-      category: '',
-      date: new Date(),
-      note: '',
-    });
+    reset(formReset);
   }, [type, reset]);
 
   const onSubmit = (data: FormData) => {
-    console.log(type, data);
-    // Handle submission based on type
+    const submitData = {
+      ...data,
+      type: type,
+    };
+    mutate(submitData, {
+      onSuccess: response => {
+        showToast(response.message, 'success');
+        reset(formReset);
+        queryClient.invalidateQueries({
+          queryKey: ['TransactionList'],
+          exact: true,
+        });
+        queryClient.invalidateQueries({
+          queryKey: ['LatestTransactionList'],
+          exact: true,
+        });
+        queryClient.invalidateQueries({
+          queryKey: ['Balance'],
+          exact: true,
+        });
+      },
+      onError: (error: any) => {
+        if (error?.response?.data?.errors) {
+          const backendErrors = error.response.data.errors;
+          backendErrors.forEach(({field, message}: any) => {
+            field &&
+              setError(field as keyof FormData, {
+                type: 'manual',
+                message,
+              });
+          });
+          showToast('Please check the form for errors', 'error');
+        } else {
+          showToast(
+            error.response?.data?.message || 'Failed to create category',
+            'error',
+          );
+        }
+      },
+    });
   };
 
-  // Get categories based on type
-  const getCategories = () => {
-    if (type === 'income') {
-      return ['Salary', 'Freelance', 'Investment'];
-    }
-    return ['Food', 'Transport', 'Shopping'];
-  };
+  const filteredCategories = (categories as Category[]).filter(
+    category => category.type === type,
+  );
 
   return (
     <View style={styles.container}>
       <View>
         <Controller
           control={control}
-          name="amount"
+          name="title"
+          rules={{
+            required: 'Title is required',
+          }}
+          render={({field: {onChange, value}}) => (
+            <InputComponent
+              value={value}
+              onChangeText={onChange}
+              error={errors.title?.message}
+              placeholder={`Add title`}
+            />
+          )}
+        />
+        <Controller
+          control={control}
+          name="price"
           rules={{
             required: 'Amount is required',
             pattern: {
@@ -76,7 +139,7 @@ const IncomeExpenses: React.FC<IncomeExpensesProps> = ({type}) => {
             <InputNumber
               value={value}
               onChangeText={onChange}
-              error={errors.amount?.message}
+              error={errors.price?.message}
               placeholder={`Enter ${type} amount`}
             />
           )}
@@ -84,17 +147,15 @@ const IncomeExpenses: React.FC<IncomeExpensesProps> = ({type}) => {
 
         <Controller
           control={control}
-          name="category"
-          rules={{
-            required: 'Category is required',
-          }}
+          name="categoryId"
+          rules={{required: 'Category is required'}}
           render={({field: {onChange, value}}) => (
             <Select
               value={value}
               onPress={onChange}
-              error={errors.category?.message}
+              error={errors.categoryId?.message}
               placeholder={`Select ${type} category`}
-              options={getCategories()}
+              options={filteredCategories}
             />
           )}
         />
@@ -102,9 +163,7 @@ const IncomeExpenses: React.FC<IncomeExpensesProps> = ({type}) => {
         <Controller
           control={control}
           name="date"
-          rules={{
-            required: 'Date is required',
-          }}
+          rules={{required: 'Date is required'}}
           render={({field: {onChange, value}}) => (
             <DatePicker
               value={value}
@@ -116,12 +175,14 @@ const IncomeExpenses: React.FC<IncomeExpensesProps> = ({type}) => {
 
         <Controller
           control={control}
-          name="note"
+          name="description"
+          rules={{required: 'Note is required'}}
           render={({field: {onChange, value}}) => (
             <TextArea
               value={value}
               onChangeText={onChange}
               placeholder="Add a note"
+              error={errors.description?.message}
             />
           )}
         />
@@ -130,6 +191,7 @@ const IncomeExpenses: React.FC<IncomeExpensesProps> = ({type}) => {
         <ButtonIconComponent
           title="Save Transaction"
           onPress={handleSubmit(onSubmit)}
+          loading={isLoading}
         />
       </View>
     </View>

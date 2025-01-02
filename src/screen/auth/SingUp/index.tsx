@@ -64,12 +64,10 @@ const SignUp: React.FC<SignUpProps> = ({navigation}) => {
   ): void => {
     mutate(data, {
       onSuccess: response => {
-        console.log('Success Response:', response);
         showToast(response.message, 'success');
         navigation.replace('SignIn');
       },
       onError: (error: AxiosError<ApiError>) => {
-        console.log('res===>', error?.response);
         if (error?.response?.data?.errors) {
           if (error.response.data.errors?.length === 1) {
             showToast(error.response.data.errors?.[0]?.message, 'error');

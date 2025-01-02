@@ -66,5 +66,12 @@ export const createStyles = () => {
       fontSize: 16,
       fontWeight: '600',
     },
+    errorText: {
+      color: theme.ERROR,
+      fontSize: 13,
+      // marginTop: 4,
+      marginLeft: 4,
+      fontWeight: '500',
+    },
   });
 };

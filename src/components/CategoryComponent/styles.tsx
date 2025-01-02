@@ -9,7 +9,8 @@ export const createStyles = () => {
       flexDirection: 'row',
       alignItems: 'center',
       justifyContent: 'space-between',
-      padding: 16,
+      paddingHorizontal: 16,
+      paddingVertical: 15,
       marginVertical: 8,
       borderRadius: 12,
       elevation: 2,
@@ -28,7 +29,7 @@ export const createStyles = () => {
       marginRight: 12,
     },
     title: {
-      fontSize: 16,
+      fontSize: 18,
       fontWeight: '600',
     },
     actions: {

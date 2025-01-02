@@ -16,7 +16,6 @@ const Toast: React.FC<ToastProps> = ({
   duration = 2000,
   onHide,
 }) => {
-  console.log('first');
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const translateY = useRef(new Animated.Value(-20)).current;
 

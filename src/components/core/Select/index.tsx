@@ -1,15 +1,30 @@
 import React, {useState} from 'react';
-import {View, Text, TouchableOpacity, Modal, FlatList} from 'react-native';
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  Modal,
+  FlatList,
+  Animated,
+} from 'react-native';
 import Entypo from 'react-native-vector-icons/Entypo';
 import {useTheme} from '../../../utils/colors';
-import {createStyles} from '../sharedStyles';
+import {createStyles} from './styles';
+
+interface Category {
+  id: string;
+  title: string;
+  icon: string;
+  type: 'income' | 'expense';
+}
 
 interface SelectProps {
   value: string;
   onPress: (selectedValue: string) => void;
   error?: string;
   placeholder?: string;
-  options: string[]; // Add options prop
+  options: Category[];
+  label?: string;
 }
 
 const SelectComponent = ({
@@ -18,44 +33,91 @@ const SelectComponent = ({
   error,
   placeholder = 'Select option',
   options,
+  label,
 }: SelectProps) => {
-  const styles = createStyles();
   const {theme} = useTheme();
   const [isModalVisible, setIsModalVisible] = useState(false);
+  const [animation] = useState(new Animated.Value(0));
+  const styles = createStyles();
+
+  const toggleModal = (visible: boolean) => {
+    setIsModalVisible(visible);
+    Animated.spring(animation, {
+      toValue: visible ? 1 : 0,
+      useNativeDriver: true,
+    }).start();
+  };
+
+  const selectedCategory = options.find(cat => cat.id === value);
+  const modalTranslateY = animation.interpolate({
+    inputRange: [0, 1],
+    outputRange: [300, 0],
+  });
 
   return (
-    <View>
+    <View style={styles.container}>
+      {label && <Text style={styles.label}>{label}</Text>}
       <TouchableOpacity
-        onPress={() => setIsModalVisible(true)}
-        style={[styles.inputContainer, error && styles.inputError]}>
+        onPress={() => toggleModal(true)}
+        style={[
+          styles.inputContainer,
+          error && {borderColor: theme.ERROR},
+          !error && {borderColor: value ? theme.PRIMARY : theme.BORDER_COLOR},
+        ]}>
         <Text style={value ? styles.input : styles.placeholderText}>
-          {value || placeholder}
+          {selectedCategory?.title || placeholder}
         </Text>
-        <Entypo name="chevron-right" size={22} color={theme.TEXT} />
+        <Entypo
+          name={isModalVisible ? 'chevron-up' : 'chevron-down'}
+          size={20}
+          color={error ? theme.ERROR : theme.TEXT}
+        />
       </TouchableOpacity>
       {error && <Text style={styles.errorText}>{error}</Text>}
 
-      {/* Modal for showing options */}
       <Modal
         visible={isModalVisible}
         transparent
-        animationType="slide"
-        onRequestClose={() => setIsModalVisible(false)}>
-        <View style={styles.modalContainer}>
-          <FlatList
-            data={options}
-            keyExtractor={(item, index) => String(index)}
-            renderItem={({item}) => (
-              <TouchableOpacity
-                style={styles.optionItem}
-                onPress={() => {
-                  onPress(item);
-                  setIsModalVisible(false);
-                }}>
-                <Text style={styles.optionText}>{item}</Text>
-              </TouchableOpacity>
-            )}
-          />
+        animationType="fade"
+        onRequestClose={() => toggleModal(false)}>
+        <View style={styles.modalOverlay}>
+          <Animated.View
+            style={[
+              styles.modalContent,
+              {transform: [{translateY: modalTranslateY}]},
+            ]}>
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>Select Category</Text>
+            </View>
+            <FlatList
+              data={options}
+              keyExtractor={item => item.id}
+              renderItem={({item}) => (
+                <TouchableOpacity
+                  style={[
+                    styles.optionItem,
+                    value === item.id && styles.selectedOption,
+                  ]}
+                  onPress={() => {
+                    onPress(item.id);
+                    toggleModal(false);
+                  }}>
+                  <Text
+                    style={[
+                      styles.optionText,
+                      value === item.id && styles.selectedOptionText,
+                    ]}>
+                    {item.title}
+                  </Text>
+                </TouchableOpacity>
+              )}
+            />
+            <TouchableOpacity
+              onPress={() => toggleModal(false)}
+              style={styles.closeButton}>
+              <Text style={styles.closeButtonText}>Close</Text>
+            </TouchableOpacity>
+          </Animated.View>
         </View>
       </Modal>
     </View>

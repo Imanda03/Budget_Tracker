@@ -3,15 +3,34 @@ import React, {PropsWithChildren} from 'react';
 import {createStyles} from './styles';
 import {useTheme} from '../../../utils/colors';
 import {EntypoIcon} from '../../../utils/Icon';
+import {useQuery} from 'react-query';
+import {getBalanceTransaction} from '../../../services/TransactionService';
 
 const CardComponent = () => {
   const styles = createStyles();
   const {theme} = useTheme();
+  const {
+    data = [],
+    refetch,
+    isLoading,
+  } = useQuery(['Balance'], getBalanceTransaction);
+
   return (
     <View style={styles.container}>
       <View style={styles.totalPriceContainer}>
         <Text style={styles.totalPrice}>Total Balance</Text>
-        <Text style={styles.totalContent}>Rs. 1000</Text>
+        <Text
+          style={[
+            styles.totalContent,
+            {
+              color:
+                data.income - data.expense > 0
+                  ? theme.SUCCESS
+                  : theme.PRICE_ERROR,
+            },
+          ]}>
+          Rs. {data.income - data.expense}
+        </Text>
       </View>
       <View style={styles.balanceCardsContainer}>
         <View style={styles.balanceCard}>
@@ -26,7 +45,7 @@ const CardComponent = () => {
             <Text style={styles.cardTitleText}>Income</Text>
           </View>
           <Text style={[styles.cardAmount, {color: theme.SUCCESS}]}>
-            Rs. 2000
+            Rs. {data.income}
           </Text>
         </View>
         <View style={styles.balanceCard}>
@@ -41,7 +60,7 @@ const CardComponent = () => {
             <Text style={styles.cardTitleText}>Expenses</Text>
           </View>
           <Text style={[styles.cardAmount, {color: theme.ERROR}]}>
-            Rs. 1000
+            Rs. {data.expense}
           </Text>
         </View>
       </View>

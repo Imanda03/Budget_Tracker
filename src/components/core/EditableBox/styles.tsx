@@ -20,6 +20,7 @@ export const createStyles = () => {
     input: {
       // flex: 1,
       height: '100%',
+      width: '100%',
       padding: 20,
       color: theme.TEXT,
       fontWeight: '500',

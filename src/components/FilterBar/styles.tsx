@@ -6,15 +6,15 @@ export const createStyles = () => {
 
   return StyleSheet.create({
     container: {
-      paddingVertical: 16,
+      paddingVertical: 20,
     },
     filterSection: {
-      gap: 16,
+      gap: 10,
     },
     typeFilters: {
       flexDirection: 'row',
       justifyContent: 'space-between',
-      marginBottom: 16,
+      marginBottom: 10,
     },
     filterButton: {
       flexDirection: 'row',
@@ -24,6 +24,12 @@ export const createStyles = () => {
       borderRadius: 25,
       flex: 0.3,
       justifyContent: 'center',
+    },
+    dateFilterContainer: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      marginTop: 10,
+      gap: 10,
     },
     buttonText: {
       marginLeft: 6,
@@ -37,6 +43,7 @@ export const createStyles = () => {
       borderRadius: 12,
       marginBottom: 8,
       paddingHorizontal: 12,
+      width: '50%',
     },
     dateButtonText: {
       marginLeft: 8,

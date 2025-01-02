@@ -3,8 +3,9 @@ import {StyleSheet} from 'react-native';
 export const createStyles = () => {
   return StyleSheet.create({
     container: {
-      flex: 1,
-      //   padding: 16,
+      flexGrow: 1,
+      // paddingHorizontal: 16,
+      // paddingBottom: 16,
     },
     emptyState: {
       flex: 1,
