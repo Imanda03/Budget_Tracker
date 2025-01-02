@@ -1,30 +1,75 @@
 import {View, Text, TouchableOpacity} from 'react-native';
-import React, {useState} from 'react';
+import React from 'react';
 import {createStyles} from './styles';
 import {AntDesignIcon} from '../../utils/Icon';
 import EditableBox from '../core/EditableBox';
 import ButtonIconComponent from '../core/ButtonIcon';
 import {useTheme} from '../../utils/colors';
+import {useMutation, useQuery, useQueryClient} from 'react-query';
+import {getUserDetails, updateProfile} from '../../services/AuthService';
+import {useToast} from '../../context/ToastContext';
+import {currentUserPayload} from '../../utils/types';
 
-const ProfileInformation = () => {
+interface ProfileInformationProps {
+  onProfileUpdate?: () => void;
+}
+
+const ProfileInformation = ({onProfileUpdate}: ProfileInformationProps) => {
   const styles = createStyles();
   const {theme} = useTheme();
-  const [editing, setEditing] = useState<boolean>(false);
-  const [values, setValues] = useState({
-    name: 'Anish Sharma',
-    email: 'asis03ktm@gmail.com',
-    contact: '9803708637',
-    address: 'Gongabu, Ktm',
+  const {showToast} = useToast();
+  const [editing, setEditing] = React.useState<boolean>(false);
+  const queryClient = useQueryClient();
+
+  const {data, isLoading} = useQuery(['UserProfile'], getUserDetails, {
+    enabled: true,
+  });
+  console.log(data);
+  const [values, setValues] = React.useState<currentUserPayload>(() => ({
+    fullName: data?.fullName || '',
+    email: data?.email || '',
+    phoneNumber: data?.phoneNumber || '',
+    address: data?.address || '',
+  }));
+
+  React.useEffect(() => {
+    if (data) {
+      setValues({
+        fullName: data.fullName || '',
+        email: data.email || '',
+        phoneNumber: data.phoneNumber || '',
+        address: data.address || '',
+      });
+    }
+  }, [data]);
+
+  const mutation = useMutation(updateProfile, {
+    onSuccess: async response => {
+      await queryClient.invalidateQueries(['UserProfile']);
+      if (onProfileUpdate) {
+        onProfileUpdate();
+      }
+      setEditing(false);
+      showToast(response.message, 'success');
+    },
+    onError: error => {
+      showToast('Unable to update profile', 'error');
+    },
   });
 
-  const onEditPress = () => {
-    setEditing(true);
-  };
-  const onChange = (key: string, value: string) => {
-    setValues(prevValues => ({...prevValues, [key]: value}));
-  };
+  if (isLoading) {
+    return (
+      <View>
+        <Text>Loading...</Text>
+      </View>
+    );
+  }
 
-  const onSave = () => {};
+  const onEditPress = () => setEditing(!editing);
+  const onChange = (key: string, value: string) => {
+    setValues(prev => ({...prev, [key]: value}));
+  };
+  const onSave = () => mutation.mutate(values);
 
   return (
     <>
@@ -37,8 +82,8 @@ const ProfileInformation = () => {
 
       <EditableBox
         label="Name"
-        onChangeText={(v: string) => onChange('name', v)}
-        value={values.name}
+        onChangeText={(v: string) => onChange('fullName', v)}
+        value={values.fullName}
         editable={editing}
       />
       <EditableBox
@@ -48,9 +93,9 @@ const ProfileInformation = () => {
         editable={editing}
       />
       <EditableBox
-        label="Contact Number"
-        onChangeText={(v: string) => onChange('contact', v)}
-        value={values.contact}
+        label="Contact"
+        onChangeText={(v: string) => onChange('phoneNumber', v)}
+        value={String(values.phoneNumber)}
         editable={editing}
       />
       <EditableBox
@@ -59,7 +104,14 @@ const ProfileInformation = () => {
         value={values.email}
         editable={editing}
       />
-      {editing && <ButtonIconComponent title="Save" onPress={onSave} />}
+      {editing && (
+        <ButtonIconComponent
+          marginTop={14}
+          title="Save"
+          onPress={onSave}
+          loading={mutation.isLoading}
+        />
+      )}
     </>
   );
 };

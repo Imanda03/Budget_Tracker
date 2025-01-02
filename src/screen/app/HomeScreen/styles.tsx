@@ -106,5 +106,16 @@ export const createStyles = () => {
       marginVertical: 20,
       borderRadius: 20,
     },
+    emptyState: {
+      flex: 1,
+      justifyContent: 'center',
+      alignItems: 'center',
+      marginTop: '50%',
+    },
+    emptyText: {
+      fontSize: 18,
+      fontWeight: '500',
+      marginTop: 16,
+    },
   });
 };

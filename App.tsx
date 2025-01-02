@@ -5,11 +5,13 @@ import RootStack from './RouteNavigation';
 // import 'react-native-reanimated';
 import 'react-native-gesture-handler';
 import {ToastProvider} from './src/context/ToastContext';
-import {AuthProvider} from './src/context/AuthContext';
+import {AuthProvider, useAuth} from './src/context/AuthContext';
 import {useEffect, useState} from 'react';
 import {AppState, AppStateStatus, Platform} from 'react-native';
 import LoadingScreen from './src/components/LoadingScreen';
 import {focusManager, QueryClient, QueryClientProvider} from 'react-query';
+import {userLogout} from './src/services/AuthService';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const onAppStateChange = (status: AppStateStatus) => {
   if (Platform.OS !== 'web') {
@@ -19,7 +21,6 @@ const onAppStateChange = (status: AppStateStatus) => {
 
 export default function App() {
   const [isLoading, setIsLoading] = useState(true);
-
   console.log('check API ===>', process.env.API_URL);
 
   useEffect(() => {
@@ -37,16 +38,20 @@ export default function App() {
     defaultOptions: {
       queries: {
         retry: 2,
-        onError: (error: any) => {
+        onError: async (error: any) => {
           if (error?.response?.status === 401) {
             console.log('Unauthorized: Please check your authentication.');
+            userLogout();
+            await AsyncStorage.getItem('sessionJwt');
           }
         },
       },
       mutations: {
-        onError: (error: any) => {
+        onError: async (error: any) => {
           if (error?.response?.status === 401) {
             console.log('Unauthorized: Please check your authentication.');
+            userLogout();
+            await AsyncStorage.getItem('sessionJwt');
           }
         },
       },

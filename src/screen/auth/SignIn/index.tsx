@@ -73,11 +73,9 @@ const SignIn = React.memo(({navigation}: any) => {
   const onSubmit = useCallback((data: loginData) => {
     mutate(data, {
       onSuccess: response => {
-        console.log('Success Response:', response);
         showToast(response.message, 'success');
       },
       onError: (error: AxiosError<ApiError>) => {
-        console.log('res===>', error?.response);
         if (error?.response?.data?.errors) {
           if (error.response.data.errors?.length === 1) {
             showToast(error.response.data.errors?.[0]?.message, 'error');
@@ -140,6 +138,7 @@ const SignIn = React.memo(({navigation}: any) => {
             marginTop={15}
             title="Login"
             onPress={handleSubmit(onSubmit)}
+            loading={isLoading}
           />
           <View style={styles.forgotPassword}>
             <TouchableOpacity activeOpacity={0.5}>

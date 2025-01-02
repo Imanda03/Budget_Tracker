@@ -44,6 +44,7 @@ export const createStyles = () => {
     dateText: {
       color: theme.TEXT,
       fontSize: 16,
+      fontWeight: '600',
     },
     placeholderText: {
       color: theme.PLACEHOLDER_COLOR,

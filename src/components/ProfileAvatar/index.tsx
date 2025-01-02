@@ -1,20 +1,40 @@
 import React from 'react';
-import {View, Image, TouchableOpacity, StyleSheet} from 'react-native';
+import {View, Image, Text, StyleSheet} from 'react-native';
 import Feather from 'react-native-vector-icons/Feather';
+import {useQuery} from 'react-query';
+import {getUserDetails} from '../../services/AuthService';
 
-const ProfileAvatar = () => {
+const ProfileAvatar = ({name}: {name?: string}) => {
+  const {data, isLoading} = useQuery(['UserProfile'], getUserDetails, {
+    enabled: true,
+  });
+
+  // const renderAvatar = imageUri ? (
+  //   // <Image source={{uri: imageUri}} style={styles.avatar} />
+  //   <Image
+  //     source={require('../../assets/Image/Profile.png')}
+  //     style={styles.avatar}
+  //   />
+  // ) : (
+  //   <View style={styles.avatar}>
+  //     <Text style={styles.avatarText}>A</Text>
+  //   </View>
+  // );
+
   return (
     <View style={styles.container}>
-      <Image
-        source={require('../../assets/Image/Profile.png')}
-        style={styles.avatar}
-      />
-      <TouchableOpacity
+      {/* {renderAvatar} */}
+      <View style={styles.avatar}>
+        <Text style={styles.avatarText}>
+          {data?.fullName?.charAt(0).toLocaleUpperCase()}
+        </Text>
+      </View>
+      {/* <TouchableOpacity
         style={styles.editButton}
         onPress={() => console.log('Edit pressed')}
         activeOpacity={0.4}>
         <Feather name="edit-2" size={18} color="#4A5568" />
-      </TouchableOpacity>
+      </TouchableOpacity> */}
     </View>
   );
 };
@@ -28,9 +48,17 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   avatar: {
-    width: '70%',
-    height: '70%',
-    borderRadius: 48,
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+    backgroundColor: '#4A5568',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  avatarText: {
+    color: 'white',
+    fontSize: 40,
+    fontWeight: 'bold',
   },
   editButton: {
     position: 'absolute',

@@ -4,6 +4,9 @@ import BackgroundWrapper from '../../../../components/BackgroundWrapper';
 import {createStyles} from './styles';
 import {AddCategory, Category} from '../../../../components/CategoryComponent';
 import AuthHeader from '../../../../components/core/AuthHeader';
+import {useQuery} from 'react-query';
+import {getCategory} from '../../../../services/CategoryService';
+import {CategoryFormData} from '../../../../utils/types';
 
 const Categories = ({navigation}: any) => {
   const styles = createStyles();
@@ -13,24 +16,21 @@ const Categories = ({navigation}: any) => {
     navigation.navigate('AddCategoryForm');
   };
 
-  const categories = [
-    {id: '1', title: 'Shopping'},
-    {id: '2', title: 'Transport'},
-    {id: '3', title: 'Food'},
-    {id: '4', title: 'Entertainment'},
-  ];
+  const {data: categories} = useQuery(['CategoryList'], () => getCategory());
 
   return (
     <BackgroundWrapper>
       <AuthHeader title="Category List" />
       <AddCategory onPress={handleAddCategory} />
       <ScrollView style={styles.container}>
-        {categories.map(category => (
+        {categories?.map((category: CategoryFormData) => (
           <Category
             key={category.id}
+            id={category.id}
             title={category.title}
+            icon={category.icon}
+            type={category.type}
             onEdit={() => {}}
-            onDelete={() => {}}
           />
         ))}
       </ScrollView>

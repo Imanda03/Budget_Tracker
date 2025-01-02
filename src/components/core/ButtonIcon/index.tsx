@@ -32,7 +32,7 @@ const ButtonIconComponent = ({
       disabled={loading}>
       {iconName && <View></View>}
       {loading ? (
-        <ActivityIndicator size="large" color={theme.SECONDARY} />
+        <ActivityIndicator size="small" color={theme.SECONDARY} />
       ) : (
         <>
           <Text style={styles.text}>{title}</Text>

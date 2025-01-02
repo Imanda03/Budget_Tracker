@@ -47,6 +47,7 @@ export interface ThemeColors {
   DARK_TEXT: string;
   BACKGROUND_LIGHT: string;
   PRICE_ERROR: string;
+  LIST_BG: string;
 }
 
 const lightTheme: ThemeColors = {
@@ -67,6 +68,7 @@ const lightTheme: ThemeColors = {
   DARK_BG: COLORS.primary,
   DARK_TEXT: COLORS.secondary,
   BACKGROUND_LIGHT: '#d0d0d6',
+  LIST_BG: '#f2f0f0',
 };
 
 const darkTheme: ThemeColors = {
@@ -88,6 +90,7 @@ const darkTheme: ThemeColors = {
   DARK_BG: COLORS.secondary,
   DARK_TEXT: COLORS.primary,
   BACKGROUND_LIGHT: '#2a2b36',
+  LIST_BG: '#202021',
 };
 
 interface UseThemeReturn {

@@ -4,7 +4,7 @@ import BackgroundWrapper from '../../../components/BackgroundWrapper';
 import {useTheme} from '../../../utils/colors';
 import {createStyles} from './styles';
 import CardComponent from '../../../components/core/Card';
-import {EntypoIcon} from '../../../utils/Icon';
+import {EntypoIcon, MaterialIcons} from '../../../utils/Icon';
 import Animated, {
   interpolate,
   useAnimatedStyle,
@@ -15,26 +15,48 @@ import {FloatingActionButton} from '../../../components/FloatingActionButton';
 import RecentTransaction from '../../../components/RecentTransaction';
 import Toast from '../../../components/core/Toast';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import {useQuery} from 'react-query';
+import {getLatestTransaction} from '../../../services/TransactionService';
+import {getUserDetails} from '../../../services/AuthService';
 
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
+
+interface PropsItem {
+  id: string;
+  date: Date;
+  description: string;
+  price: string;
+  title: string;
+  type: string;
+  categoryId: {
+    icon: string;
+  };
+}
+
+interface RenderProductItemProps {
+  item: PropsItem;
+  index: number;
+}
 
 const HomeScreen = ({navigation}: any) => {
   const styles = createStyles();
   const {theme, isDark, setTheme} = useTheme();
   const [isExpanded, setIsExpanded] = useState(false);
 
-  useEffect(() => {
-    const fetch = async () => {
-      console.log('token ====>', await AsyncStorage.getItem('sessionJwt'));
-    };
+  const {
+    data: latesTransaction = [],
+    refetch,
+    isLoading,
+  } = useQuery(['LatestTransactionList'], getLatestTransaction);
 
-    fetch();
-  }, []);
+  const {data: userData} = useQuery(['UserProfile'], getUserDetails, {
+    enabled: true,
+  });
 
+  console.log('latest==>', latesTransaction);
   const handlePress = useCallback(() => {
     setIsExpanded(prev => !prev);
   }, []);
-
   const plusIconStyle = useAnimatedStyle(() => {
     const rotateValue = withTiming(isExpanded ? '45deg' : '0deg');
     return {
@@ -51,8 +73,8 @@ const HomeScreen = ({navigation}: any) => {
     [navigation],
   );
 
-  const RenderFloatingButton = () => {
-    return (
+  const FloatingButtonContent = useCallback(
+    () => (
       <View style={styles.buttonContainer}>
         <AnimatedPressable
           onPress={handlePress}
@@ -76,12 +98,28 @@ const HomeScreen = ({navigation}: any) => {
           onPress={() => handleButtonPress(1)}
         />
       </View>
-    );
+    ),
+    [handlePress, plusIconStyle, handleButtonPress, isExpanded, styles],
+  );
+
+  const renderRecentTransaction = ({item, index}: RenderProductItemProps) => {
+    return <RecentTransaction {...item} />;
   };
 
-  const renderRecentTransaction = () => {
-    return <RecentTransaction />;
+  const handleNavigation = () => {
+    navigation.navigate('History');
   };
+
+  const EmptyListComponent = () => (
+    <View style={styles.emptyState}>
+      <MaterialIcons name="receipt-long" size={64} color={theme.PURPLE} />
+      <Text style={[styles.emptyText, {color: theme.TEXT}]}>
+        No transactions found
+      </Text>
+    </View>
+  );
+
+  const firstName = userData?.fullName.split(' ')[0];
 
   return (
     <View style={{flex: 1}}>
@@ -90,7 +128,7 @@ const HomeScreen = ({navigation}: any) => {
           <View style={styles.headerContainer}>
             <View style={styles.textContainer}>
               <Text style={styles.headTitle}>Kharcha</Text>
-              <Text style={styles.headSubtitle}>Hello, Anish</Text>
+              <Text style={styles.headSubtitle}>Hello, {firstName}</Text>
             </View>
             <TouchableOpacity
               onPress={() =>
@@ -105,30 +143,34 @@ const HomeScreen = ({navigation}: any) => {
           </View>
           <CardComponent />
           <FlatList
-            data={[1, 2, 3, 4, 5, 6, 7, 8.9, 10, 11]}
+            data={latesTransaction}
             renderItem={renderRecentTransaction}
-            keyExtractor={index => String(index)}
+            keyExtractor={(item: PropsItem) => String(item.id)}
             showsVerticalScrollIndicator={false}
             style={styles.flatList}
             scrollEnabled={true}
             bounces={true}
+            ListEmptyComponent={EmptyListComponent}
             stickyHeaderIndices={[0]}
             ListHeaderComponent={
               <View style={styles.transactionHeader}>
                 <Text style={styles.transactionText}>Recent Transaction</Text>
-                <TouchableOpacity>
+                <TouchableOpacity onPress={handleNavigation}>
                   <Text style={[styles.transactionText, {fontSize: 12}]}>
                     See All
                   </Text>
                 </TouchableOpacity>
               </View>
             }
-            ListFooterComponent={<View style={{height: 200}} />}
+            ListFooterComponent={<View style={{height: 150}} />}
+            onRefresh={refetch}
+            refreshing={isLoading}
           />
         </BackgroundWrapper>
       </View>
       <View style={styles.fabWrapper}>
-        <RenderFloatingButton />
+        <FloatingButtonContent />
+        {/* {FloatingButtonContent()} */}
       </View>
     </View>
   );

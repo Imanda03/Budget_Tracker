@@ -33,6 +33,12 @@ export const createStyles = () => {
       gap: 5,
       justifyContent: 'space-between',
     },
+    iconContainer: {
+      padding: 12,
+      borderRadius: 20,
+      marginRight: 5,
+      alignContent: 'center',
+    },
     text: {
       fontSize: 18,
       color: theme.TEXT,
